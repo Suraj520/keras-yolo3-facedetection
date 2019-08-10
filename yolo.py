@@ -19,13 +19,22 @@ import os
 from keras.utils import multi_gpu_model
 
 class YOLO(object):
+    # _defaults = {
+    #     "model_path": 'model_data/yolo.h5',
+    #     "anchors_path": 'model_data/yolo_anchors.txt',
+    #     "classes_path": 'model_data/coco_classes.txt',
+    #     "score" : 0.3,
+    #     "iou" : 0.45,
+    #     "model_image_size" : (416, 416),
+    #     "gpu_num" : 1,
+    # }
     _defaults = {
-        "model_path": 'model_data/yolo.h5',
-        "anchors_path": 'model_data/yolo_anchors.txt',
-        "classes_path": 'model_data/coco_classes.txt',
+        "model_path": 'model_data/wider_face_yolo.h5',
+        "anchors_path": 'model_data/wider_anchors.txt',
+        "classes_path": 'model_data/wider_classes.txt',
         "score" : 0.3,
         "iou" : 0.45,
-        "model_image_size" : (416, 416),
+        "model_image_size" : (608, 608),
         "gpu_num" : 1,
     }
 
@@ -146,20 +155,28 @@ class YOLO(object):
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
             print(label, (left, top), (right, bottom))
 
-            if top - label_size[1] >= 0:
-                text_origin = np.array([left, top - label_size[1]])
-            else:
-                text_origin = np.array([left, top + 1])
+            # if top - label_size[1] >= 0:
+            #     text_origin = np.array([left, top - label_size[1]])
+            # else:
+            #     text_origin = np.array([left, top + 1])
 
-            # My kingdom for a good redistributable image drawing library.
-            for i in range(thickness):
-                draw.rectangle(
-                    [left + i, top + i, right - i, bottom - i],
-                    outline=self.colors[c])
-            draw.rectangle(
-                [tuple(text_origin), tuple(text_origin + label_size)],
-                fill=self.colors[c])
-            draw.text(text_origin, label, fill=(0, 0, 0), font=font)
+            # # My kingdom for a good redistributable image drawing library.
+            # for i in range(thickness):
+            #     draw.rectangle(
+            #         [left + i, top + i, right - i, bottom - i],
+            #         outline=self.colors[c])
+            # draw.rectangle(
+            #     [tuple(text_origin), tuple(text_origin + label_size)],
+            #     fill=self.colors[c])
+            # draw.text(text_origin, label, fill=(0, 0, 0), font=font)
+            
+            ############### FOR PIXELIZATION ################
+            area = (left, top, right, bottom)
+            filter = image.crop(area)
+            filter = filter.resize((8, 8), Image.ANTIALIAS)
+            filter = filter.resize(((right-left),(bottom-top)), Image.ANTIALIAS)
+            image.paste(filter, (left,top))
+
             del draw
 
         end = timer()
@@ -174,20 +191,24 @@ def detect_video(yolo, video_path, output_path=""):
     vid = cv2.VideoCapture(video_path)
     if not vid.isOpened():
         raise IOError("Couldn't open webcam or video")
-    video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
+    #video_FourCC    = int(vid.get(cv2.CAP_PROP_FOURCC))
+    video_FourCC    =  cv2.VideoWriter_fourcc(*"XVID")
     video_fps       = vid.get(cv2.CAP_PROP_FPS)
     video_size      = (int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)),
                         int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     isOutput = True if output_path != "" else False
     if isOutput:
         print("!!! TYPE:", type(output_path), type(video_FourCC), type(video_fps), type(video_size))
-        out = cv2.VideoWriter(output_path, video_FourCC, video_fps, video_size)
+        out = cv2.VideoWriter(output_path, video_FourCC, 10, video_size)
     accum_time = 0
     curr_fps = 0
     fps = "FPS: ??"
     prev_time = timer()
     while True:
         return_value, frame = vid.read()
+        if frame is None:
+            break
+        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)
@@ -200,11 +221,13 @@ def detect_video(yolo, video_path, output_path=""):
             accum_time = accum_time - 1
             fps = "FPS: " + str(curr_fps)
             curr_fps = 0
-        cv2.putText(result, text=fps, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=0.50, color=(255, 0, 0), thickness=2)
-        cv2.namedWindow("result", cv2.WINDOW_NORMAL)
-        cv2.imshow("result", result)
+        #cv2.putText(result, text=fps, org=(3, 15), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+        #            fontScale=0.50, color=(255, 0, 0), thickness=2)
+        #cv2.namedWindow("result", cv2.WINDOW_NORMAL)
+        # cv2.imshow("result", result)
         if isOutput:
+            #output_name = '/video_out/' + str(curr_time)
+            #image.save(output_name, "JPG")
             out.write(result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

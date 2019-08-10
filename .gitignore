@@ -5,6 +5,11 @@
 logs/
 *_test.py
 
+WIDER_train/
+WIDER_val/
+*.mp4
+*.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
