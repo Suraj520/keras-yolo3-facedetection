@@ -1,28 +1,25 @@
-# keras-yolo3
+# keras-yolo3-facedetection
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Introduction
 
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+This is a real-time face detection model using YOLOv3 with Keras. 
 
+The YOLOv3 in Keras was done by [qqweee](https://github.com/qqwweee/keras-yolo3).
 
 ---
 
 ## Quick Start
 
-1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
-2. Convert the Darknet YOLO model to a Keras model.
+1. Download YOLOv3-Face model from [HERE](https://drive.google.com/file/d/1zU_n5CwnGfYgFNLQ1JZlsl-rHjPV-kmp/view?usp=sharing)
+2. Place `wider_face_yolo.h5` into `model_data/`
 3. Run YOLO detection.
 
 ```
-wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 python yolo_video.py [OPTIONS...] --image, for image detection mode, OR
 python yolo_video.py [video_path] [output_path (optional)]
 ```
-
-For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
 
 ### Usage
 Use --help to see usage of yolo_video.py:
@@ -46,8 +43,6 @@ optional arguments:
   --image            Image detection mode, will ignore all positional arguments
 ```
 ---
-
-4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
 ## Training
 
@@ -79,21 +74,7 @@ If you want to use original pretrained weights for YOLOv3:
 
 ---
 
-## Some issues to know
+## Result
 
-1. The test environment is
-    - Python 3.5.2
-    - Keras 2.1.5
-    - tensorflow 1.6.0
-
-2. Default anchors are used. If you use your own anchors, probably some changes are needed.
-
-3. The inference result is not totally the same as Darknet but the difference is small.
-
-4. The speed is slower than Darknet. Replacing PIL with opencv may help a little.
-
-5. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
-
-6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
-
-7. For speeding up the training process with frozen layers train_bottleneck.py can be used. It will compute the bottleneck features of the frozen model first and then only trains the last layers. This makes training on CPU possible in a reasonable time. See [this](https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html) for more information on bottleneck features.
+#### Video Inference Result
+[![](https://img.youtube.com/vi/HPq3ceeiVWU/maxresdefault.jpg)](https://www.youtube.com/watch?v=HPq3ceeiVWU&feature=youtu.be)
