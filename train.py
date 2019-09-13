@@ -43,47 +43,12 @@ def _main():
     with open(train_annotation_path) as f:
         lines = f.readlines()
 
-    # with open(val_annotation_path) as f2:
-    #     val_lines = f2.readlines()
-
     np.random.seed(10101)
     np.random.shuffle(lines)
-    #np.random.shuffle(val_lines)
     np.random.seed(None)
     num_val = int(len(lines)*val_split)
     num_train = len(lines) - num_val
 
-    #num_train = len(lines)
-    #num_val = len(val_lines)
-
-    # Train with frozen layers first, to get a stable loss.
-    # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
-    # if True:
-    #     model.compile(optimizer=Adam(lr=1e-3), loss={
-    #         # use custom yolo_loss Lambda layer.
-    #         'yolo_loss': lambda y_true, y_pred: y_pred})
-
-    #     #batch_size = 4
-    #     batch_size = 8
-    #     print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-    #     model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
-    #             steps_per_epoch=max(1, num_train//batch_size),
-    #             validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
-    #             validation_steps=max(1, num_val//batch_size),
-    #             epochs=50,
-    #             initial_epoch=0,
-    #             callbacks=[logging, checkpoint])
-    #     # model.fit_generator(data_generator_wrapper(lines, batch_size, input_shape, anchors, num_classes),
-    #     #         steps_per_epoch=max(1, num_train//batch_size),
-    #     #         validation_data=data_generator_wrapper(val_lines, batch_size, input_shape, anchors, num_classes),
-    #     #         validation_steps=max(1, num_val//batch_size),
-    #     #         epochs=50,
-    #     #         initial_epoch=0,
-    #     #         callbacks=[logging, checkpoint])
-    #     model.save_weights(log_dir + 'trained_weights_stage_1.h5')
-
-    # Unfreeze and continue training, to fine-tune.
-    # Train longer if the result is not good.
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
@@ -99,13 +64,6 @@ def _main():
             epochs=100,
             initial_epoch=60,
             callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-        # model.fit_generator(data_generator_wrapper(lines, batch_size, input_shape, anchors, num_classes),
-        #     steps_per_epoch=max(1, num_train//batch_size),
-        #     validation_data=data_generator_wrapper(val_lines, batch_size, input_shape, anchors, num_classes),
-        #     validation_steps=max(1, num_val//batch_size),
-        #     epochs=100,
-        #     initial_epoch=50,
-        #     callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save_weights(log_dir + 'trained_weights_final.h5')
 
     # Further training if needed.

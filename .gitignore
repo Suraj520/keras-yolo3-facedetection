@@ -6,7 +6,6 @@ logs/
 *_test.py
 
 WIDER_train/
-WIDER_val/
 *.mp4
 *.ini
 
