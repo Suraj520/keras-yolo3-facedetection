@@ -6,7 +6,8 @@
 
 This is a real-time face detection model using YOLOv3 with Keras. 
 
-The YOLOv3 in Keras was done by [qqweee](https://github.com/qqwweee/keras-yolo3).
+The YOLOv3 in Keras was done by [qqweee](https://github.com/qqwweee/keras-yolo3). <br />
+Face dataset from [WIDER Face](http://shuoyang1213.me/WIDERFACE/)
 
 ---
 
