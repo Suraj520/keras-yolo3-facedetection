@@ -78,4 +78,4 @@ If you want to use original pretrained weights for YOLOv3:
 ## Result
 
 #### Video Inference Result
-[![](https://img.youtube.com/vi/HPq3ceeiVWU/maxresdefault.jpg)](https://youtu.be/XPMrPiRkBUc)
+[![](image/thumbnail_image.png)](https://youtu.be/XPMrPiRkBUc)

@@ -1,5 +1,6 @@
 *.jpg
 *.png
+!image/thumbnail_image.png
 *.weights
 *.h5
 logs/
